@@ -1,0 +1,133 @@
+﻿@model IEnumerable<CarRentalManagementSystem.Models.Rental>
+
+@{
+    ViewData["Title"] = "Manage Rentals";
+    string status = ViewBag.Status as string ?? "";
+}
+
+<h2>Manage Rentals</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-4">
+        <label class="form-label">Filter by Status</label>
+        <select name="status" class="form-select">
+            <option value="" selected="@(string.IsNullOrWhiteSpace(status))">All</option>
+            <option value="Pending" selected="@(status == "Pending")">Pending</option>
+            <option value="Approved" selected="@(status == "Approved")">Approved</option>
+            <option value="Rejected" selected="@(status == "Rejected")">Rejected</option>
+            <option value="Completed" selected="@(status == "Completed")">Completed</option>
+        </select>
+    </div>
+    <div class="col-md-2 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary w-100">Apply</button>
+    </div>
+</form>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-info">
+        No rentals found.
+    </div>
+}
+else
+{
+    <table class="table table-striped table-bordered align-middle">
+        <thead>
+            <tr>
+                <th>Requested</th>
+                <th>Customer</th>
+                <th>Car</th>
+                <th>Dates</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th style="width: 220px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var r in Model)
+            {
+                <tr>
+                    <td>@r.RequestedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>
+                        @if (r.Customer != null)
+                        {
+                            <div><strong>@r.Customer.FullName</strong></div>
+                            <div class="text-muted">@r.Customer.Email</div>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Customer not found</span>
+                        }
+                    </td>
+                    <td>
+                        @if (r.Car != null)
+                        {
+                            @($"{r.Car.Make} {r.Car.Model} ({r.Car.Year})")
+                        }
+                        else
+                        {
+                            <span class="text-muted">Car not found</span>
+                        }
+                    </td>
+                    <td>@r.StartDate.ToString("yyyy-MM-dd") - @r.EndDate.ToString("yyyy-MM-dd")</td>
+                    <td>$@r.TotalCost.ToString("0.00")</td>
+                    <td>
+                        @if (r.Status == "Approved")
+                        {
+                            <span class="badge bg-success">Approved</span>
+                        }
+                        else if (r.Status == "Rejected")
+                        {
+                            <span class="badge bg-danger">Rejected</span>
+                        }
+                        else if (r.Status == "Completed")
+                        {
+                            <span class="badge bg-secondary">Completed</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning text-dark">Pending</span>
+                        }
+                    </td>
+                    <td>
+                        @if (r.Status == "Pending")
+                        {
+                            <form asp-action="Approve" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@r.RentalId" />
+                                <button type="submit" class="btn btn-sm btn-success">Approve</button>
+                            </form>
+
+                            <form asp-action="Reject" method="post" class="d-inline ms-1">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@r.RentalId" />
+                                <button type="submit" class="btn btn-sm btn-danger">Reject</button>
+                            </form>
+                        }
+                        else if (r.Status == "Approved")
+                        {
+                            <form asp-action="Complete" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@r.RentalId" />
+                                <button type="submit" class="btn btn-sm btn-secondary">Mark Completed</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <span class="text-muted">No actions</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

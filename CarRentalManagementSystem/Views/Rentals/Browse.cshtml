@@ -1,0 +1,92 @@
+﻿@model IEnumerable<CarRentalManagementSystem.Models.Car>
+
+@{
+    ViewData["Title"] = "Browse Cars";
+    var categories = ViewBag.Categories as List<string> ?? new List<string>();
+}
+
+<h2>Browse Cars</h2>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-4">
+        <input name="search" value="@ViewBag.Search" class="form-control" placeholder="Search by make or model..." />
+    </div>
+
+    <div class="col-md-3">
+        <select name="category" class="form-select">
+            <option value="">All categories</option>
+            @foreach (var c in categories)
+            {
+                <option value="@c" selected="@(ViewBag.Category == c)">
+                    @c
+                </option>
+            }
+        </select>
+    </div>
+
+    <div class="col-md-3 d-flex align-items-center">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="availableOnly" value="true" @(ViewBag.AvailableOnly ? "checked" : "") />
+            <label class="form-check-label">Available only</label>
+        </div>
+    </div>
+
+    <div class="col-md-2">
+        <button class="btn btn-primary w-100" type="submit">Filter</button>
+    </div>
+</form>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Image</th>
+            <th>Car</th>
+            <th>Category</th>
+            <th>Seats</th>
+            <th>Rate</th>
+            <th>Available</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var car in Model)
+        {
+            <tr>
+                <td style="width:120px;">
+                    @if (!string.IsNullOrEmpty(car.ImagePath))
+                    {
+                        <img src="@car.ImagePath" alt="Car image" style="width:110px; height:auto; border-radius:4px;" />
+                    }
+                    else
+                    {
+                        <span>No image</span>
+                    }
+                </td>
+                <td>@car.Make @car.Model (@car.Year)</td>
+                <td>@car.Category</td>
+                <td>@car.Seats</td>
+                <td>$@car.DailyRate.ToString("0.00")/day</td>
+                <td>@(car.IsAvailable ? "Yes" : "No")</td>
+                <td>
+                    @if (car.IsAvailable)
+                    {
+                        <a class="btn btn-sm btn-success" asp-action="Request" asp-route-carId="@car.CarId">Request Rental</a>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Unavailable</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

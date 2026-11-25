@@ -1,0 +1,93 @@
+﻿@{
+    ViewData["Title"] = "Home";
+}
+
+<div class="p-4 p-md-5 mb-4 rounded-3 bg-light border">
+    <div class="container-fluid py-3">
+        <h1 class="display-6 fw-bold mb-2">SwiftDrive Car Rentals</h1>
+        <p class="col-md-8 fs-5 text-muted mb-3">
+            Browse vehicles, request rentals, and manage approvals with role-based access.
+        </p>
+
+        <div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-primary btn-lg" asp-controller="Rentals" asp-action="Browse">
+                Browse Cars
+            </a>
+
+            @if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Customer"))
+            {
+                <a class="btn btn-outline-primary btn-lg" asp-controller="Rentals" asp-action="MyRentals">
+                    My Rentals
+                </a>
+            }
+
+            @if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+            {
+                <a class="btn btn-outline-dark btn-lg" asp-controller="Rentals" asp-action="Manage">
+                    Manage Rentals
+                </a>
+                <a class="btn btn-outline-dark btn-lg" asp-controller="Cars" asp-action="Index">
+                    Manage Cars
+                </a>
+            }
+        </div>
+
+        @if (User.Identity == null || !User.Identity.IsAuthenticated)
+        {
+            <div class="mt-3 text-muted">
+                Create an account or log in to request rentals.
+            </div>
+        }
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Simple Booking</h5>
+                <p class="card-text text-muted">
+                    Choose your dates, submit a request, and track approval status from your account.
+                </p>
+            </div>
+            <div class="card-footer bg-white border-0">
+                <a class="btn btn-sm btn-outline-primary" asp-controller="Rentals" asp-action="Browse">Get started</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Role-Based Access</h5>
+                <p class="card-text text-muted">
+                    Customers request rentals. Admins approve, reject, and complete rentals securely.
+                </p>
+            </div>
+            <div class="card-footer bg-white border-0">
+                @if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                {
+                    <a class="btn btn-sm btn-outline-dark" asp-controller="Rentals" asp-action="Manage">Open admin queue</a>
+                }
+                else
+                {
+                    <span class="text-muted small">Admin tools appear after admin login.</span>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Clean Catalog</h5>
+                <p class="card-text text-muted">
+                    Browse by category and search by make/model. Vehicle images display on the listing.
+                </p>
+            </div>
+            <div class="card-footer bg-white border-0">
+                <a class="btn btn-sm btn-outline-primary" asp-controller="Rentals" asp-action="Browse">View cars</a>
+            </div>
+        </div>
+    </div>
+</div>

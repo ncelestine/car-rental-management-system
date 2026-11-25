@@ -1,0 +1,37 @@
+﻿@model CarRentalManagementSystem.ViewModels.RentalRequestViewModel
+
+@{
+    ViewData["Title"] = "Request Rental";
+}
+
+<h2>Request Rental</h2>
+
+<div class="mb-3">
+    <strong>Car:</strong> @Model.CarDisplay
+</div>
+
+<form asp-action="Request" method="post">
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" asp-for="CarId" />
+    <input type="hidden" asp-for="CarDisplay" />
+
+    <div class="mb-3">
+        <label asp-for="StartDate" class="form-label"></label>
+        <input asp-for="StartDate" class="form-control" />
+        <span asp-validation-for="StartDate" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="EndDate" class="form-label"></label>
+        <input asp-for="EndDate" class="form-control" />
+        <span asp-validation-for="EndDate" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit Request</button>
+    <a asp-action="Browse" class="btn btn-secondary">Back</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
